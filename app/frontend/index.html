@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AgriSmart AI</title>
+<style>
+  body { font-family: sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; color: #222; }
+  h1 { color: #2e7d32; }
+  #preview { max-width: 100%; margin: 16px 0; border-radius: 8px; display: none; }
+  button { background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 15px; }
+  button:disabled { background: #999; cursor: not-allowed; }
+  #result { margin-top: 20px; padding: 16px; background: #f1f8f2; border-radius: 8px; display: none; }
+  .label { font-weight: bold; }
+</style>
+</head>
+<body>
+  <h1>AgriSmart AI</h1>
+  <p>Upload a crop leaf photo to detect disease.</p>
+
+  <input type="file" id="fileInput" accept="image/*">
+  <img id="preview">
+  <br>
+  <button id="analyzeBtn" disabled>Analyze</button>
+
+  <div id="result"></div>
+
+  <script>
+    const API_URL = "http://localhost:5000/predict";
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const resultDiv = document.getElementById("result");
+    let selectedFile = null;
+
+    fileInput.addEventListener("change", (e) => {
+      selectedFile = e.target.files[0];
+      if (selectedFile) {
+        preview.src = URL.createObjectURL(selectedFile);
+        preview.style.display = "block";
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    analyzeBtn.addEventListener("click", async () => {
+      if (!selectedFile) return;
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = "Analyzing...";
+      resultDiv.style.display = "none";
+
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: formData });
+        const data = await res.json();
+
+        resultDiv.innerHTML = data.error
+          ? `<p style="color:red">${data.error}</p>`
+          : `<p><span class="label">Disease:</span> ${data.disease}</p>
+             <p><span class="label">Confidence:</span> ${(data.confidence * 100).toFixed(1)}%</p>`;
+        resultDiv.style.display = "block";
+      } catch (err) {
+        resultDiv.innerHTML = `<p style="color:red">Could not reach the backend. Is app/backend/main.py running?</p>`;
+        resultDiv.style.display = "block";
+      }
+
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = "Analyze";
+    });
+  </script>
+</body>
+</html>
