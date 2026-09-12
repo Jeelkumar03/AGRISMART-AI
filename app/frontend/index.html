@@ -1,37 +1,72 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgriSmart AI</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<title>AgriSmart AI</title>
+<style>
+  body { font-family: sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; color: #222; }
+  h1 { color: #2e7d32; }
+  #preview { max-width: 100%; margin: 16px 0; border-radius: 8px; display: none; }
+  button { background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 15px; }
+  button:disabled { background: #999; cursor: not-allowed; }
+  #result { margin-top: 20px; padding: 16px; background: #f1f8f2; border-radius: 8px; display: none; }
+  .label { font-weight: bold; }
+</style>
 </head>
 <body>
-  <main class="app">
-    <section class="card" id="upload-section">
-      <h2>Scan Crop</h2>
-      <input type="file" id="image-input" accept="image/png, image/jpeg" capture="environment" />
-      <img id="preview" class="preview hidden" alt="Selected crop image" />
-      <button id="submit-btn" disabled>Analyze</button>
-      <p id="upload-error" class="error hidden"></p>
-    </section>
+  <h1>AgriSmart AI</h1>
+  <p>Upload a crop leaf photo to detect disease.</p>
 
-    <section class="card hidden" id="result-section" aria-live="polite">
-      <h2>Result</h2>
-      <div id="result-body"></div>
-    </section>
+  <input type="file" id="fileInput" accept="image/*">
+  <img id="preview">
+  <br>
+  <button id="analyzeBtn" disabled>Analyze</button>
 
-    <section class="card" id="weather-section">
-      <h2>Weather &amp; Irrigation</h2>
-      <div id="weather-body">Loading…</div>
-    </section>
+  <div id="result"></div>
 
-    <section class="card hidden" id="sustainability-section">
-      <h2>Sustainability Score</h2>
-      <div id="sustainability-body"></div>
-    </section>
-  </main>
-  <script src="app.js"></script>
+  <script>
+    const API_URL = "http://localhost:5000/predict";
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const resultDiv = document.getElementById("result");
+    let selectedFile = null;
+
+    fileInput.addEventListener("change", (e) => {
+      selectedFile = e.target.files[0];
+      if (selectedFile) {
+        preview.src = URL.createObjectURL(selectedFile);
+        preview.style.display = "block";
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    analyzeBtn.addEventListener("click", async () => {
+      if (!selectedFile) return;
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = "Analyzing...";
+      resultDiv.style.display = "none";
+
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: formData });
+        const data = await res.json();
+
+        resultDiv.innerHTML = data.error
+          ? `<p style="color:red">${data.error}</p>`
+          : `<p><span class="label">Disease:</span> ${data.disease}</p>
+             <p><span class="label">Confidence:</span> ${(data.confidence * 100).toFixed(1)}%</p>`;
+        resultDiv.style.display = "block";
+      } catch (err) {
+        resultDiv.innerHTML = `<p style="color:red">Could not reach the backend. Is app/backend/main.py running?</p>`;
+        resultDiv.style.display = "block";
+      }
+
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = "Analyze";
+    });
+  </script>
 </body>
 </html>

@@ -4,6 +4,7 @@ Run from the project root:
     python app/backend/main.py
 """
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -43,7 +44,7 @@ def predict_route():
     if file.filename == "":
         return jsonify({"error": "Empty filename"}), 400
 
-    tmp_path = "/tmp/upload.jpg"
+    tmp_path = str(Path(tempfile.gettempdir()) / "upload.jpg")
     file.save(tmp_path)
 
     try:
