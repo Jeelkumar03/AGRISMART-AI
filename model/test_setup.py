@@ -1,35 +1,54 @@
-"""Confirms Python, libraries, and the dataset path all work together.
-
-Usage:
-    python test_setup.py
-"""
 from pathlib import Path
+import sys
 
-from PIL import Image
+print("=== AgriSmart AI - ML Setup Test ===")
 
-DATA_DIR = Path("data/train")
+# Python
+print(f"Python version: {sys.version}")
 
+# PyTorch
+try:
+    import torch
+    print(f"PyTorch version: {torch.__version__}")
+    print(f"CUDA available: {torch.cuda.is_available()}")
 
-def main():
-    if not DATA_DIR.exists():
-        print(f"ERROR: {DATA_DIR} not found. Put your dataset in data/train/<class_name>/*.jpg")
-        return
+    if torch.cuda.is_available():
+        print(f"GPU: {torch.cuda.get_device_name(0)}")
+    else:
+        print("GPU: Not available - CPU will be used locally")
 
-    class_dirs = [p for p in DATA_DIR.iterdir() if p.is_dir()]
-    if not class_dirs:
-        print(f"ERROR: no class subfolders found inside {DATA_DIR}")
-        return
-
-    sample_image = next(class_dirs[0].glob("*.*"), None)
-    if sample_image is None:
-        print(f"ERROR: no images found inside {class_dirs[0]}")
-        return
-
-    img = Image.open(sample_image)
-    print("Setup OK.")
-    print(f"Found {len(class_dirs)} classes.")
-    print(f"Sample image: {sample_image.name}, size={img.size}, mode={img.mode}")
+except Exception as e:
+    print(f"PyTorch error: {e}")
 
 
-if __name__ == "__main__":
-    main()
+# Dataset paths
+train_dir = Path("data/train")
+val_dir = Path("data/val")
+
+print(f"\nTrain folder exists: {train_dir.exists()}")
+print(f"Validation folder exists: {val_dir.exists()}")
+
+if train_dir.exists() and val_dir.exists():
+
+    train_classes = sorted(
+        folder.name for folder in train_dir.iterdir()
+        if folder.is_dir()
+    )
+
+    val_classes = sorted(
+        folder.name for folder in val_dir.iterdir()
+        if folder.is_dir()
+    )
+
+    print(f"Train classes: {len(train_classes)}")
+    print(f"Validation classes: {len(val_classes)}")
+
+    if train_classes == val_classes:
+        print("Class check: PASS")
+    else:
+        print("Class check: FAIL")
+
+else:
+    print("Dataset folders are missing.")
+
+print("\n=== Setup test complete ===")
