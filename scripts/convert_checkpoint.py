@@ -9,7 +9,7 @@ from pathlib import Path
 
 import torch
 
-SRC = Path("model/checkpoints/best_model.pth")      
+SRC = Path("model/checkpoints/best_model.pth")          
 DEST_DIR = Path("experiments/experiment_001")
 
 DEST_DIR.mkdir(parents=True, exist_ok=True)

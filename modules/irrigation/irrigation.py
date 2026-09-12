@@ -5,6 +5,18 @@ RAIN_PROBABILITY_THRESHOLD = 70  # above this %, delay irrigation
 
 
 def get_irrigation_recommendation(soil_moisture_pct, weather=None):
+    """Return an irrigation action + human-readable reason.
+
+    soil_moisture_pct: 0-100. None or out-of-range values return an error dict
+    instead of a recommendation, so the caller can show a clear message rather
+    than acting on bad sensor data.
+    """
+    if soil_moisture_pct is None or not (0 <= soil_moisture_pct <= 100):
+        return {
+            "action": "UNKNOWN",
+            "reason": f"Invalid soil moisture reading: {soil_moisture_pct!r}. Expected 0-100.",
+        }
+
     rain_prob = None
     if weather and not weather.get("error"):
         rain_prob = weather.get("rain_probability_pct")

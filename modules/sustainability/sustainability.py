@@ -8,9 +8,14 @@ signals (pesticide use, water logs, etc.) as your data allows.
 WEIGHTS = {"crop_health": 0.5, "water_efficiency": 0.3, "resource_usage": 0.2}
 
 
+def _is_healthy(disease):
+    # Class names follow "<Crop>___healthy" (e.g. "Tomato___healthy"), not a bare "healthy".
+    return "healthy" in (disease or "").lower()
+
+
 def compute_sustainability_score(disease, irrigation, weather):
-    crop_health = 100 if (disease or "").lower() == "healthy" else 60
-    water_efficiency = 100 if irrigation.get("action") == "DELAY IRRIGATION" else 70
+    crop_health = 100 if _is_healthy(disease) else 60
+    water_efficiency = 100 if (irrigation or {}).get("action") == "DELAY IRRIGATION" else 70
     resource_usage = 80  # placeholder baseline
 
     score = (
