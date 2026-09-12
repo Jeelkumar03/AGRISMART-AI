@@ -9,3 +9,4 @@ data/val/
 
 # trained weights are large binaries -- regenerate with train.py or share separately
 *.pth
+!experiments/experiment_001/best_model.pth
