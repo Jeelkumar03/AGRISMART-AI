@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in · AgriSmart AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .auth-page { min-height: 100vh; display: grid; place-items: center; padding: 32px 18px; }
+  .auth-wrap { width: 100%; max-width: 430px; animation: fadeUp 0.55s var(--ease); }
+
+  .brand { text-align: center; margin-bottom: 26px; }
+  .brand__leaf {
+    width: 54px; height: 54px; margin: 0 auto 14px;
+    display: grid; place-items: center; border-radius: 18px;
+    background: linear-gradient(145deg, rgba(131,190,106,0.34), rgba(131,190,106,0.08));
+    border: 1px solid rgba(131,190,106,0.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+    animation: breathe 5s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .brand h1 { font-size: 1.72rem; }
+  .brand p { margin: 7px 0 0; color: var(--paper-dim); font-size: 0.94rem; }
+
+  .tabs {
+    display: flex; position: relative;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-sm);
+    padding: 4px; margin-bottom: 24px;
+  }
+  .tabs__glider {
+    position: absolute; top: 4px; bottom: 4px; left: 4px;
+    width: calc(50% - 4px); border-radius: 11px;
+    background: linear-gradient(140deg, rgba(255,255,255,0.24), rgba(255,255,255,0.09));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: transform 0.45s var(--ease);
+  }
+  .tabs.signup .tabs__glider { transform: translateX(100%); }
+  .tab {
+    flex: 1; position: relative; z-index: 1;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 0.93rem; font-weight: 500;
+    color: var(--paper-dim); padding: 11px 0;
+    transition: color 0.3s ease;
+  }
+  .tab[aria-selected="true"] { color: var(--paper); }
+
+  .auth-card { padding: 28px 26px 26px; }
+  .pane { display: none; }
+  .pane.active { display: block; animation: fadeUp 0.4s var(--ease); }
+  .pane h2 { font-size: 1.22rem; margin-bottom: 4px; }
+  .pane-sub { color: var(--paper-dim); font-size: 0.9rem; margin: 0 0 22px; }
+
+  .helper { font-size: 0.79rem; color: var(--paper-faint); margin: 6px 0 0; }
+  .loc-chip { display: none; align-items: center; gap: 8px; margin-top: 9px; font-size: 0.82rem; color: var(--moss); }
+  .loc-chip.show { display: flex; animation: popIn 0.3s var(--ease); }
+
+  @media (max-width: 540px) { .auth-card { padding: 24px 20px; } }
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <div class="blob blob--moss"></div>
+  <div class="blob blob--wheat"></div>
+  <div class="blob blob--slate"></div>
+  <div class="blob blob--brick"></div>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<div id="boot">
+  <div class="boot-mark">AgriSmart AI</div>
+  <div><span class="spinner boot-spin"></span>Checking your session…</div>
+</div>
+
+<section class="auth-page">
+  <div class="auth-wrap">
+    <div class="brand">
+      <div class="brand__leaf">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9FD186" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <h1>AgriSmart AI</h1>
+      <p>Spot crop disease from a single leaf photo.</p>
+    </div>
+
+    <div class="glass auth-card">
+      <div class="tabs" id="tabs" role="tablist">
+        <span class="tabs__glider" aria-hidden="true"></span>
+        <button class="tab" id="tabLogin"  role="tab" aria-selected="true"  aria-controls="paneLogin">Log in</button>
+        <button class="tab" id="tabSignup" role="tab" aria-selected="false" aria-controls="paneSignup">Create account</button>
+      </div>
+
+      <div class="notice" id="authNotice" role="alert"></div>
+
+      <div class="pane active" id="paneLogin" role="tabpanel">
+        <h2>Welcome back</h2>
+        <p class="pane-sub">Log in with the email you registered.</p>
+
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <div class="input-shell">
+            <input type="email" id="loginEmail" autocomplete="email" placeholder="you@example.com">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <div class="input-shell">
+            <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Your password">
+            <button type="button" class="ghost" data-toggle="loginPassword">Show</button>
+          </div>
+        </div>
+
+        <button class="btn" id="loginBtn"><span class="sheen"></span><span class="btn-label">Log in</span></button>
+      </div>
+
+      <div class="pane" id="paneSignup" role="tabpanel">
+        <h2>Create your account</h2>
+        <p class="pane-sub">Your location lets us tailor weather and irrigation advice.</p>
+
+        <div class="field">
+          <label for="suName">Full name</label>
+          <div class="input-shell">
+            <input type="text" id="suName" autocomplete="name" placeholder="Jeel Kumar">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="suEmail">Email</label>
+          <div class="input-shell">
+            <input type="email" id="suEmail" autocomplete="email" placeholder="you@example.com">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="suPassword">Password</label>
+          <div class="input-shell">
+            <input type="password" id="suPassword" autocomplete="new-password" placeholder="At least 6 characters">
+            <button type="button" class="ghost" data-toggle="suPassword">Show</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="suLocation">Village or district</label>
+          <div class="input-shell">
+            <input type="text" id="suLocation" autocomplete="address-level2" placeholder="Anand, Gujarat">
+            <button type="button" class="ghost" id="useGpsBtn">Use GPS</button>
+          </div>
+          <p class="helper">We look up coordinates for weather. GPS is more precise.</p>
+          <div class="loc-chip" id="locChip">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="locChipText"></span>
+          </div>
+        </div>
+
+        <button class="btn" id="signupBtn"><span class="sheen"></span><span class="btn-label">Create account</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+import {
+  auth, db, FALLBACK_COORDS, authMessage, enableGlassHighlight,
+  $, showNotice, hideNotice, setLoading
+} from "./firebase-config.js";
+import {
+  createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+enableGlassHighlight();
+
+const notice = $("authNotice");
+const isValidEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v || "").trim());
+
+// Already signed in? Skip straight to the app.
+onAuthStateChanged(auth, user => {
+  if (user) { window.location.replace("index.html"); return; }
+  $("boot").classList.add("hide");
+});
+
+// ─── Tabs ──────────────────────────────────────────────────
+function selectTab(which) {
+  const isSignup = which === "signup";
+  $("tabs").classList.toggle("signup", isSignup);
+  $("tabLogin").setAttribute("aria-selected", String(!isSignup));
+  $("tabSignup").setAttribute("aria-selected", String(isSignup));
+  $("paneLogin").classList.toggle("active", !isSignup);
+  $("paneSignup").classList.toggle("active", isSignup);
+  hideNotice(notice);
+}
+$("tabLogin").addEventListener("click", () => selectTab("login"));
+$("tabSignup").addEventListener("click", () => selectTab("signup"));
+
+// ─── Password visibility ───────────────────────────────────
+document.querySelectorAll("[data-toggle]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const input = $(btn.dataset.toggle);
+    const hidden = input.type === "password";
+    input.type = hidden ? "text" : "password";
+    btn.textContent = hidden ? "Hide" : "Show";
+  });
+});
+
+// ─── Location ──────────────────────────────────────────────
+let pickedCoords = null;
+
+$("useGpsBtn").addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    showNotice(notice, "This browser can't share location. Type your village name instead.");
+    return;
+  }
+  $("useGpsBtn").textContent = "Locating…";
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      pickedCoords = { lat: +pos.coords.latitude.toFixed(4), lon: +pos.coords.longitude.toFixed(4) };
+      $("useGpsBtn").textContent = "Use GPS";
+      $("locChipText").textContent = "Location pinned from GPS";
+      $("locChip").classList.add("show");
+    },
+    () => {
+      $("useGpsBtn").textContent = "Use GPS";
+      showNotice(notice, "Couldn't read your location. Type your village name instead.");
+    },
+    { timeout: 8000 }
+  );
+});
+
+// Turn a typed place name into coordinates (Open-Meteo geocoding, no key needed).
+async function geocode(placeName) {
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(placeName)}&count=1&language=en`;
+    const data = await (await fetch(url)).json();
+    const hit = data?.results?.[0];
+    return hit ? { lat: +hit.latitude.toFixed(4), lon: +hit.longitude.toFixed(4) } : null;
+  } catch { return null; }
+}
+
+// ─── Sign up ───────────────────────────────────────────────
+$("signupBtn").addEventListener("click", async () => {
+  hideNotice(notice);
+  const name     = $("suName").value.trim();
+  const email    = $("suEmail").value.trim();
+  const password = $("suPassword").value;
+  const locName  = $("suLocation").value.trim();
+
+  if (name.length < 2)      return showNotice(notice, "Enter your full name.");
+  if (!isValidEmail(email)) return showNotice(notice, "Enter a valid email address.");
+  if (password.length < 6)  return showNotice(notice, "Use a password of at least 6 characters.");
+  if (!locName && !pickedCoords) return showNotice(notice, "Add your village name, or tap Use GPS.");
+
+  setLoading($("signupBtn"), true);
+  try {
+    let coords = pickedCoords;
+    if (!coords && locName) coords = await geocode(locName);
+    if (!coords) coords = { lat: FALLBACK_COORDS.lat, lon: FALLBACK_COORDS.lon };
+
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName: name });
+
+    const record = {
+      name, email,
+      locationName: locName || "GPS location",
+      lat: coords.lat, lon: coords.lon
+    };
+    try {
+      await setDoc(doc(db, "users", cred.user.uid), { ...record, createdAt: new Date().toISOString() });
+    } catch {
+      // Firestore may not be enabled — the account still works.
+      localStorage.setItem(`agrismart:${cred.user.uid}`, JSON.stringify(record));
+    }
+    // onAuthStateChanged redirects to index.html from here.
+  } catch (err) {
+    showNotice(notice, authMessage(err.code));
+    setLoading($("signupBtn"), false, "Create account");
+  }
+});
+
+// ─── Log in ────────────────────────────────────────────────
+$("loginBtn").addEventListener("click", async () => {
+  hideNotice(notice);
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
+
+  if (!isValidEmail(email)) return showNotice(notice, "Enter a valid email address.");
+  if (!password)            return showNotice(notice, "Enter your password.");
+
+  setLoading($("loginBtn"), true);
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    showNotice(notice, authMessage(err.code));
+    setLoading($("loginBtn"), false, "Log in");
+  }
+});
+
+// Enter submits the visible pane.
+document.querySelectorAll("input").forEach(input => {
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    if ($("paneSignup").classList.contains("active")) $("signupBtn").click();
+    else $("loginBtn").click();
+  });
+});
+</script>
+</body>
+</html>

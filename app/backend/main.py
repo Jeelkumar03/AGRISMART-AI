@@ -52,6 +52,8 @@ def predict_route():
         result = predict_disease(tmp_path, model, classes)
     except FileNotFoundError:
         return jsonify({"error": "Model not trained yet. Run train.py first."}), 503
+    except (OSError, ValueError):
+        return jsonify({"error": "Uploaded file is not a valid image."}), 400
     except Exception as e:
         return jsonify({"error": f"Prediction failed: {e}"}), 500
 
@@ -84,4 +86,4 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+   app.run(host="0.0.0.0", port=5000, debug=True)

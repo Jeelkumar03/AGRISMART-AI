@@ -2,98 +2,443 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AgriSmart AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriSmart AI — Crop diagnosis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 <style>
-  body { font-family: sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; color: #222; }
-  h1 { color: #2e7d32; }
-  #preview { max-width: 100%; margin: 16px 0; border-radius: 8px; display: none; }
-  button { background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 15px; }
-  button:disabled { background: #999; cursor: not-allowed; }
-  #result { margin-top: 20px; padding: 16px; background: #f1f8f2; border-radius: 8px; display: none; }
-  #result hr { border: none; border-top: 1px solid #cfe3d0; margin: 12px 0; }
-  .label { font-weight: bold; }
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    background: rgba(7,19,12,0.62);
+    border-bottom: 1px solid rgba(255,255,255,0.09);
+  }
+  .topbar__inner {
+    max-width: 780px; margin: 0 auto; padding: 13px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  }
+  .wordmark { font-family: 'Fraunces', serif; font-size: 1.06rem; display: flex; align-items: center; gap: 9px; }
+  .wordmark .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--paper-faint);
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .wordmark .dot.ok   { background: var(--moss);  box-shadow: 0 0 12px rgba(131,190,106,0.75); }
+  .wordmark .dot.down { background: var(--brick); box-shadow: 0 0 12px rgba(229,131,99,0.7); }
+
+  .userchip { display: flex; align-items: center; gap: 11px; }
+  .avatar {
+    width: 33px; height: 33px; border-radius: 11px;
+    display: grid; place-items: center;
+    font-size: 0.85rem; font-weight: 600; color: #08160D;
+    background: linear-gradient(140deg, #9FD186, var(--moss-deep));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .userchip__meta { line-height: 1.25; }
+  .userchip__meta b { font-size: 0.88rem; font-weight: 600; display: block; }
+  .userchip__meta span { font-size: 0.76rem; color: var(--paper-faint); }
+
+  main { max-width: 780px; margin: 0 auto; padding: 34px 20px 90px; animation: fadeUp 0.5s var(--ease); }
+
+  .hero { margin-bottom: 26px; }
+  .hero h2 { font-size: clamp(1.5rem, 4.2vw, 2.05rem); line-height: 1.22; max-width: 19ch; }
+  .hero p { color: var(--paper-dim); margin: 12px 0 0; max-width: 50ch; font-size: 0.97rem; }
+
+  .upload-card { padding: 20px; }
+  .dropzone {
+    display: block; width: 100%; cursor: pointer;
+    border: 1.6px dashed rgba(255,255,255,0.26);
+    border-radius: 19px; padding: 38px 18px; text-align: center;
+    transition: border-color 0.3s var(--ease), background-color 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: rgba(131,190,106,0.75);
+    background: rgba(131,190,106,0.09);
+    transform: scale(1.008);
+  }
+  .dropzone input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .dz-icon { font-size: 1.7rem; margin-bottom: 10px; opacity: 0.8; }
+  .dz-title { font-weight: 600; font-size: 0.99rem; }
+  .dz-hint { font-size: 0.83rem; color: var(--paper-faint); margin-top: 6px; }
+
+  .preview-wrap { position: relative; display: none; border-radius: 19px; overflow: hidden; }
+  .preview-wrap.show { display: block; animation: popIn 0.4s var(--ease); }
+  #preview { display: block; width: 100%; max-height: 330px; object-fit: cover; }
+  .scanline {
+    position: absolute; left: 0; right: 0; height: 3px; top: 0; display: none;
+    background: linear-gradient(90deg, transparent, var(--wheat), transparent);
+    box-shadow: 0 0 22px 5px rgba(233,188,78,0.5);
+  }
+  .scanning .scanline { display: block; animation: scan 1.5s ease-in-out infinite; }
+  .scanning::after { content: ""; position: absolute; inset: 0; background: rgba(7,19,12,0.35); }
+  @keyframes scan { 0% { top: 0; } 50% { top: calc(100% - 3px); } 100% { top: 0; } }
+
+  .upload-actions { display: flex; gap: 12px; align-items: center; margin-top: 17px; }
+  .upload-actions .btn { flex: 1; }
+
+  #report { margin-top: 26px; display: none; }
+  #report.show { display: block; }
+
+  .rcard { padding: 22px 24px; margin-bottom: 15px; opacity: 0; transform: translateY(16px); }
+  .rcard.in { animation: riseIn 0.55s var(--ease) forwards; }
+  @keyframes riseIn { to { opacity: 1; transform: none; } }
+
+  .rlabel { font-family: 'Fraunces', serif; font-style: italic; font-size: 0.88rem; color: var(--paper-faint); margin: 0 0 13px; }
+
+  .crop-name { font-family: 'Fraunces', serif; font-size: 1.62rem; font-weight: 600; margin: 0; }
+  .condition { font-size: 1.04rem; margin: 3px 0 17px; font-weight: 500; }
+  .condition.alert { color: var(--brick); }
+  .condition.healthy { color: var(--moss); }
+  .condition.uncertain { color: var(--slate); }
+
+  .bar { height: 7px; border-radius: 4px; background: rgba(255,255,255,0.12); overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; border-radius: 4px; background: linear-gradient(90deg, var(--moss-deep), var(--moss)); transition: width 1.05s var(--ease); }
+  .bar.wheat > i { background: linear-gradient(90deg, #B8862A, var(--wheat)); }
+  .bar-cap { font-size: 0.81rem; color: var(--paper-faint); margin: 7px 0 0; }
+
+  .pill { display: inline-block; font-size: 0.87rem; font-weight: 600; padding: 7px 16px; border-radius: 999px; border: 1px solid currentColor; }
+  .pill.moss  { color: var(--moss);  background: rgba(131,190,106,0.12); }
+  .pill.slate { color: var(--slate); background: rgba(134,176,209,0.12); }
+  .pill.dim   { color: var(--paper-faint); }
+  .reason { margin: 13px 0 0; color: var(--paper-dim); font-size: 0.93rem; }
+
+  .figs { display: flex; gap: 12px; flex-wrap: wrap; }
+  .fig {
+    flex: 1; min-width: 96px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 15px; padding: 14px 15px;
+  }
+  .fig b { font-family: 'Fraunces', serif; font-size: 1.42rem; font-weight: 600; display: block; }
+  .fig span { font-size: 0.77rem; color: var(--paper-faint); }
+
+  .advice { list-style: none; padding: 0; margin: 16px 0 0; }
+  .advice li { position: relative; padding-left: 21px; margin-bottom: 9px; font-size: 0.92rem; color: var(--paper-dim); }
+  .advice li::before { content: ""; position: absolute; left: 3px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--wheat); }
+
+  .score-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+  .score-row b { font-family: 'Fraunces', serif; font-size: 2.5rem; font-weight: 600; line-height: 1; }
+  .score-row span { color: var(--paper-faint); font-size: 0.95rem; }
+
+  .sub { margin-bottom: 16px; }
+  .sub:last-child { margin-bottom: 0; }
+  .sub__head { display: flex; justify-content: space-between; font-size: 0.89rem; margin-bottom: 6px; }
+  .sub__head span:last-child { color: var(--paper-dim); }
+  .sub__cap { font-size: 0.78rem; color: var(--paper-faint); margin: 6px 0 0; }
+
+  footer { max-width: 780px; margin: 0 auto; padding: 0 20px 42px; font-size: 0.81rem; color: var(--paper-faint); }
+
+  @media (max-width: 540px) {
+    .rcard { padding: 20px 18px; }
+    .userchip__meta { display: none; }
+  }
 </style>
 </head>
 <body>
-  <h1>AgriSmart AI</h1>
-  <p>Upload a crop leaf photo to detect disease.</p>
 
-  <input type="file" id="fileInput" accept="image/*">
-  <img id="preview">
-  <br>
-  <button id="analyzeBtn" disabled>Analyze</button>
+<div class="bg" aria-hidden="true">
+  <div class="blob blob--moss"></div>
+  <div class="blob blob--wheat"></div>
+  <div class="blob blob--slate"></div>
+  <div class="blob blob--brick"></div>
+</div>
+<div class="grain" aria-hidden="true"></div>
 
-  <div id="result"></div>
+<div id="boot">
+  <div class="boot-mark">AgriSmart AI</div>
+  <div><span class="spinner boot-spin"></span>Loading your account…</div>
+</div>
 
-  <script>
-    const PREDICT_URL = "http://localhost:5000/predict";
-    const RECOMMEND_URL = "http://localhost:5000/recommendation";
-    const LOCATION = { lat: 23.02, lon: 72.57 };  // Ahmedabad — change if needed
+<header class="topbar">
+  <div class="topbar__inner">
+    <span class="wordmark"><span class="dot" id="healthDot"></span>AgriSmart AI</span>
+    <div class="userchip">
+      <span class="avatar" id="avatar">–</span>
+      <span class="userchip__meta">
+        <b id="userName">–</b>
+        <span id="userLocation">–</span>
+      </span>
+      <button class="linkbtn" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</header>
 
-    const fileInput = document.getElementById("fileInput");
-    const preview = document.getElementById("preview");
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const resultDiv = document.getElementById("result");
-    let selectedFile = null;
+<main>
+  <div class="hero">
+    <h2>Know what's wrong with the crop before you walk the next row.</h2>
+    <p>Upload a leaf photo. You'll get the disease, today's weather risk, and whether to irrigate — in seconds.</p>
+  </div>
 
-    fileInput.addEventListener("change", (e) => {
-      selectedFile = e.target.files[0];
-      if (selectedFile) {
-        preview.src = URL.createObjectURL(selectedFile);
-        preview.style.display = "block";
-        analyzeBtn.disabled = false;
-      }
+  <div class="notice" id="appNotice" role="alert"></div>
+
+  <div class="glass upload-card">
+    <label class="dropzone" id="dropzone" for="fileInput" tabindex="0">
+      <div id="dzIdle">
+        <div class="dz-icon">🍃</div>
+        <div class="dz-title">Drop a leaf photo, or tap to browse</div>
+        <div class="dz-hint">JPG or PNG · one leaf, plain background, good light</div>
+      </div>
+      <div class="preview-wrap" id="previewWrap">
+        <img id="preview" alt="Selected leaf photo">
+        <span class="scanline"></span>
+      </div>
+      <input type="file" id="fileInput" accept="image/*">
+    </label>
+    <div class="upload-actions">
+      <button class="btn" id="analyzeBtn" disabled><span class="sheen"></span><span class="btn-label">Analyze leaf</span></button>
+      <button class="linkbtn" id="resetBtn" style="display:none;">Different photo</button>
+    </div>
+  </div>
+
+  <div id="report">
+    <div class="glass rcard" id="cardDiagnosis"></div>
+    <div class="glass rcard" id="cardIrrigation"></div>
+    <div class="glass rcard" id="cardWeather"></div>
+    <div class="glass rcard" id="cardSustain"></div>
+  </div>
+</main>
+
+<footer>Curious Coders · AgriSmart AI · Smart India Hackathon</footer>
+
+<script type="module">
+import {
+  auth, db, API_BASE, FALLBACK_COORDS, enableGlassHighlight,
+  $, showNotice, hideNotice, setLoading
+} from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+enableGlassHighlight();
+
+const notice = $("appNotice");
+let profile = null;
+
+// ─── Auth guard ────────────────────────────────────────────
+async function loadProfile(user) {
+  try {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (snap.exists()) return snap.data();
+  } catch { /* Firestore may be disabled; fall through */ }
+
+  const cached = localStorage.getItem(`agrismart:${user.uid}`);
+  if (cached) return JSON.parse(cached);
+
+  return {
+    name: user.displayName || "Farmer",
+    email: user.email || "",
+    locationName: FALLBACK_COORDS.label,
+    lat: FALLBACK_COORDS.lat,
+    lon: FALLBACK_COORDS.lon
+  };
+}
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.replace("login.html"); return; }
+
+  profile = await loadProfile(user);
+  $("userName").textContent = profile.name;
+  $("userLocation").textContent = profile.locationName;
+  $("avatar").textContent = (profile.name || "F").trim().charAt(0).toUpperCase();
+  $("boot").classList.add("hide");
+  checkBackend();
+});
+
+$("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.replace("login.html");
+});
+
+// ─── Backend health ────────────────────────────────────────
+function checkBackend() {
+  fetch(`${API_BASE}/health`)
+    .then(r => { if (!r.ok) throw new Error(); $("healthDot").className = "dot ok"; })
+    .catch(() => { $("healthDot").className = "dot down"; });
+}
+
+// ─── Upload ────────────────────────────────────────────────
+const dropzone = $("dropzone"), fileInput = $("fileInput"), previewWrap = $("previewWrap");
+const analyzeBtn = $("analyzeBtn"), resetBtn = $("resetBtn"), report = $("report");
+let selectedFile = null;
+
+function handleFile(file) {
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    showNotice(notice, "That file isn't an image. Choose a JPG or PNG photo.");
+    return;
+  }
+  selectedFile = file;
+  $("preview").src = URL.createObjectURL(file);
+  $("dzIdle").style.display = "none";
+  previewWrap.classList.add("show");
+  analyzeBtn.disabled = false;
+  resetBtn.style.display = "inline-block";
+  report.classList.remove("show");
+  hideNotice(notice);
+}
+
+fileInput.addEventListener("change", e => handleFile(e.target.files[0]));
+["dragover", "dragenter"].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add("drag"); }));
+["dragleave", "drop"].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove("drag"); }));
+dropzone.addEventListener("drop", e => handleFile(e.dataTransfer.files[0]));
+dropzone.addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
+});
+
+resetBtn.addEventListener("click", e => {
+  e.preventDefault();
+  selectedFile = null;
+  fileInput.value = "";
+  $("dzIdle").style.display = "block";
+  previewWrap.classList.remove("show");
+  analyzeBtn.disabled = true;
+  resetBtn.style.display = "none";
+  report.classList.remove("show");
+  hideNotice(notice);
+});
+
+// ─── Formatting ────────────────────────────────────────────
+// Model labels look like "Apple___Cedar_apple_rust" — split into crop + condition.
+function parseLabel(raw) {
+  if (!raw || raw === "Uncertain") return { crop: null, condition: null, state: "uncertain" };
+  const [cropPart, conditionPart = ""] = raw.split("___");
+  const crop = cropPart.replace(/_/g, " ").replace(/\s+/g, " ").trim();
+  const condition = conditionPart.replace(/_/g, " ").replace(/\s+/g, " ").trim();
+  const healthy = /healthy/i.test(condition);
+  return { crop, condition: healthy ? "No disease detected" : condition, state: healthy ? "healthy" : "alert" };
+}
+
+const sentence = s => (s || "").charAt(0).toUpperCase() + (s || "").slice(1).toLowerCase();
+
+function revealCards(ids) {
+  ids.forEach((id, i) => {
+    const el = $(id);
+    el.style.display = el.innerHTML.trim() ? "" : "none";
+    el.classList.remove("in");
+    void el.offsetWidth;                 // restart the animation
+    el.style.animationDelay = `${i * 95}ms`;
+    el.classList.add("in");
+  });
+}
+
+// ─── Render ────────────────────────────────────────────────
+function renderDiagnosis(data) {
+  const info = parseLabel(data.disease);
+  const pct = Math.round((data.confidence || 0) * 100);
+
+  if (info.state === "uncertain") {
+    const closest = parseLabel(data.raw_prediction || "");
+    const hint = closest.crop ? ` Closest match was ${closest.crop}.` : "";
+    $("cardDiagnosis").innerHTML = `
+      <p class="rlabel">Diagnosis</p>
+      <p class="condition uncertain">Not confident enough to name a disease.${hint}</p>
+      <p class="reason">Try again with a closer, sharper photo of a single leaf against a plain background.</p>
+      <div class="bar wheat" style="margin-top:16px"><i data-w="${pct}"></i></div>
+      <p class="bar-cap">${pct}% confidence — below the 50% threshold</p>`;
+  } else {
+    $("cardDiagnosis").innerHTML = `
+      <p class="rlabel">Diagnosis</p>
+      <p class="crop-name">${info.crop}</p>
+      <p class="condition ${info.state}">${info.condition}</p>
+      <div class="bar"><i data-w="${pct}"></i></div>
+      <p class="bar-cap">${pct}% confidence</p>`;
+  }
+}
+
+function renderIrrigation(rec) {
+  const irr = rec.irrigation || {};
+  const action = irr.action || "UNKNOWN";
+  const tone = action === "IRRIGATE" ? "slate" : action === "UNKNOWN" ? "dim" : "moss";
+  $("cardIrrigation").innerHTML = `
+    <p class="rlabel">Irrigation</p>
+    <span class="pill ${tone}">${sentence(action)}</span>
+    <p class="reason">${irr.reason || ""}</p>`;
+}
+
+function renderWeather(rec) {
+  const w = rec.weather || {};
+  if (w.error) {
+    $("cardWeather").innerHTML = `<p class="rlabel">Weather</p><p class="reason">${w.error}</p>`;
+    return;
+  }
+  const advice = (w.advice || []).map(a => `<li>${a}</li>`).join("");
+  $("cardWeather").innerHTML = `
+    <p class="rlabel">Weather · ${profile?.locationName || ""}</p>
+    <div class="figs">
+      <div class="fig"><b>${w.temperature_c ?? "—"}°</b><span>Temperature</span></div>
+      <div class="fig"><b>${w.humidity_pct ?? "—"}%</b><span>Humidity</span></div>
+      <div class="fig"><b>${w.rain_probability_pct ?? "—"}%</b><span>Rain chance</span></div>
+    </div>
+    <ul class="advice">${advice}</ul>`;
+}
+
+function renderSustainability(rec) {
+  const s = rec.sustainability || {};
+  const b = s.breakdown || {}, w = s.weights || {};
+  const row = (key, label) => `
+    <div class="sub">
+      <div class="sub__head"><span>${label}</span><span>${b[key] ?? "—"} / 100</span></div>
+      <div class="bar"><i data-w="${b[key] ?? 0}"></i></div>
+      <p class="sub__cap">Counts for ${Math.round((w[key] || 0) * 100)}% of the total.</p>
+    </div>`;
+  $("cardSustain").innerHTML = `
+    <p class="rlabel">Sustainability score</p>
+    <div class="score-row"><b>${s.score ?? "—"}</b><span>out of 100</span></div>
+    ${row("crop_health", "Crop health")}
+    ${row("water_efficiency", "Water efficiency")}
+    ${row("resource_usage", "Resource usage")}`;
+}
+
+// ─── Analyze ───────────────────────────────────────────────
+analyzeBtn.addEventListener("click", async () => {
+  if (!selectedFile) return;
+  hideNotice(notice);
+  setLoading(analyzeBtn, true);
+  previewWrap.classList.add("scanning");
+  report.classList.remove("show");
+
+  const body = new FormData();
+  body.append("image", selectedFile);
+
+  try {
+    const predictData = await (await fetch(`${API_BASE}/predict`, { method: "POST", body })).json();
+    if (predictData.error) { showNotice(notice, predictData.error); return; }
+
+    renderDiagnosis(predictData);
+
+    // An uncertain reading gives no disease to reason about, so skip the advice call.
+    if (predictData.disease !== "Uncertain") {
+      const recData = await (await fetch(`${API_BASE}/recommendation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          disease: predictData.disease,
+          lat: profile?.lat ?? FALLBACK_COORDS.lat,
+          lon: profile?.lon ?? FALLBACK_COORDS.lon,
+          soil_moisture: 40
+        })
+      })).json();
+      renderIrrigation(recData);
+      renderWeather(recData);
+      renderSustainability(recData);
+    } else {
+      ["cardIrrigation", "cardWeather", "cardSustain"].forEach(id => { $(id).innerHTML = ""; });
+    }
+
+    report.classList.add("show");
+    revealCards(["cardDiagnosis", "cardIrrigation", "cardWeather", "cardSustain"]);
+    requestAnimationFrame(() => {
+      document.querySelectorAll("#report .bar > i").forEach(bar => { bar.style.width = `${bar.dataset.w}%`; });
     });
-
-    analyzeBtn.addEventListener("click", async () => {
-      if (!selectedFile) return;
-      analyzeBtn.disabled = true;
-      analyzeBtn.textContent = "Analyzing...";
-      resultDiv.style.display = "none";
-
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-
-      try {
-        const predictRes = await fetch(PREDICT_URL, { method: "POST", body: formData });
-        const predictData = await predictRes.json();
-
-        if (predictData.error) {
-          resultDiv.innerHTML = `<p style="color:red">${predictData.error}</p>`;
-          resultDiv.style.display = "block";
-          return;
-        }
-
-        const recRes = await fetch(RECOMMEND_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            disease: predictData.disease,
-            lat: LOCATION.lat,
-            lon: LOCATION.lon,
-            soil_moisture: 40
-          })
-        });
-        const recData = await recRes.json();
-
-        resultDiv.innerHTML = `
-          <p><span class="label">Disease:</span> ${predictData.disease}</p>
-          <p><span class="label">Confidence:</span> ${(predictData.confidence * 100).toFixed(1)}%</p>
-          <hr>
-          <p><span class="label">Irrigation:</span> ${recData.irrigation.action} — ${recData.irrigation.reason}</p>
-          <p><span class="label">Sustainability Score:</span> ${recData.sustainability.score}/100</p>
-          <p><span class="label">Weather:</span> ${recData.weather.temperature_c}°C, ${recData.weather.humidity_pct}% humidity</p>
-          <p><span class="label">Advice:</span> ${recData.weather.advice.join(" ")}</p>
-        `;
-        resultDiv.style.display = "block";
-      } catch (err) {
-        resultDiv.innerHTML = `<p style="color:red">Could not reach the backend. Is app/backend/main.py running?</p>`;
-        resultDiv.style.display = "block";
-      }
-
-      analyzeBtn.disabled = false;
-      analyzeBtn.textContent = "Analyze";
-    });
-  </script>
+    $("cardDiagnosis").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  } catch {
+    showNotice(notice, "Can't reach the server. Start it with: python app/backend/main.py");
+  } finally {
+    previewWrap.classList.remove("scanning");
+    setLoading(analyzeBtn, false, "Analyze leaf");
+  }
+});
+</script>
 </body>
 </html>

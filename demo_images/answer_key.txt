@@ -1,0 +1,5 @@
+﻿test1.JPG  ->  Apple___Cedar_apple_rust
+test2.jpg  ->  Tomato___Late_blight
+test3.JPG  ->  Corn_(maize)___Common_rust_
+test4.JPG  ->  Potato___healthy
+test5.JPG  ->  Grape___Black_rot
