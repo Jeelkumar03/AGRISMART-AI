@@ -13,13 +13,16 @@ IMG_SIZE = 224
 BATCH_SIZE = 32
 
 # Training gets augmentation (helps the model generalize to messy field photos).
+# GaussianBlur + RandomErasing simulate phone-camera noise and partial occlusion.
 TRAIN_TRANSFORMS = transforms.Compose([
-    transforms.RandomResizedCrop(IMG_SIZE, scale=(0.8, 1.0)),
+    transforms.RandomResizedCrop(IMG_SIZE, scale=(0.75, 1.0)),
     transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(15),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+    transforms.RandomRotation(20),
+    transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.02),
+    transforms.RandomApply([transforms.GaussianBlur(kernel_size=3)], p=0.15),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    transforms.RandomErasing(p=0.15, scale=(0.02, 0.1)),
 ])
 
 # Validation/prediction use fixed, non-random transforms so results are reproducible.

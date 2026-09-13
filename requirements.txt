@@ -1,10 +1,9 @@
 torch
 torchvision
-scikit-learn
-pandas
-matplotlib
-pillow
 flask
 flask-cors
+pillow
 requests
-pytest
+scikit-learn
+numpy
+python-dotenv

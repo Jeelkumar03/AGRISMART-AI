@@ -11,9 +11,13 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT / "model"))
 sys.path.append(str(ROOT))
 
+from dotenv import load_dotenv  # noqa: E402
+load_dotenv()
+
 from flask import Flask, jsonify, request  # noqa: E402
 from flask_cors import CORS  # noqa: E402
 
+from modules.explain.explain import generate_explanation  # noqa: E402
 from modules.irrigation.irrigation import get_irrigation_recommendation  # noqa: E402
 from modules.sustainability.sustainability import compute_sustainability_score  # noqa: E402
 from modules.weather.weather import get_weather_recommendation  # noqa: E402
@@ -80,10 +84,26 @@ def recommendation_route():
     })
 
 
+@app.route("/explain", methods=["POST"])
+def explain_route():
+    """Grounded, plain-language explanation of an already-computed diagnosis."""
+    data = request.get_json(force=True) or {}
+    result = generate_explanation(
+        crop=data.get("crop"),
+        condition=data.get("condition"),
+        confidence=data.get("confidence", 0) * 100,
+        irrigation=data.get("irrigation", {}),
+        weather=data.get("weather", {}),
+        sustainability=data.get("sustainability", {}),
+        language=data.get("language", "English"),
+    )
+    return jsonify(result)
+
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})
 
 
 if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

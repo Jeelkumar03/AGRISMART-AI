@@ -1,5 +1,6 @@
-"""One-time converter: Kaggle checkpoint dict -> raw state_dict + classes.json
-   expected by model/predict.py.
+"""One-time converter: a Kaggle-style checkpoint dict (model_state_dict +
+classes + metadata bundled together) -> the raw state_dict + classes.json
+format that model/predict.py expects.
 
 Run from repo root:
     python scripts/convert_checkpoint.py
@@ -9,7 +10,7 @@ from pathlib import Path
 
 import torch
 
-SRC = Path("model/checkpoints/best_model.pth")          
+SRC = Path("model/checkpoints/best_model.pth")  # wherever you downloaded the Kaggle checkpoint to
 DEST_DIR = Path("experiments/experiment_001")
 
 DEST_DIR.mkdir(parents=True, exist_ok=True)

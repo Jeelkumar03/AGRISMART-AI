@@ -22,7 +22,7 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 /** Flask backend origin. */
-export const API_BASE = `http://${window.location.hostname}:5000`;
+export const API_BASE = "http://localhost:5000";
 
 /** Used when a location can't be resolved. */
 export const FALLBACK_COORDS = { lat: 23.02, lon: 72.57, label: "Ahmedabad, Gujarat" };
@@ -65,8 +65,10 @@ export function showNotice(el, message, kind = "error") {
 
 export function hideNotice(el) { el.classList.remove("show"); }
 
-export function setLoading(btn, loading, idleLabel) {
+import { t } from "./i18n.js";
+
+export function setLoading(btn, loading, idleLabelKey) {
   const label = btn.querySelector(".btn-label");
   btn.disabled = loading;
-  label.innerHTML = loading ? `<span class="spinner"></span>Working…` : idleLabel;
+  label.innerHTML = loading ? `<span class="spinner"></span>${t("working")}` : t(idleLabelKey);
 }

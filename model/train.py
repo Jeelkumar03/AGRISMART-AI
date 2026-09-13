@@ -1,7 +1,7 @@
 """Train a transfer-learning disease classifier (two-stage: frozen head, then fine-tune).
 
 Usage:
-    python train.py --stage1-epochs 5 --stage2-epochs 30 --lr 1e-3 --fine-tune-lr 1e-4
+    python -m model.train --stage1-epochs 5 --stage2-epochs 30 --lr 1e-3 --fine-tune-lr 1e-4
 """
 import argparse
 import json
@@ -25,6 +25,15 @@ def set_seed(seed: int) -> None:
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
+
+
+def compute_class_weights(dataset, num_classes):
+    """Inverse-frequency weighting so rare classes (e.g. 86-sample Corn
+    Cercospora) contribute as much to the loss as common ones."""
+    counts = np.bincount(dataset.targets, minlength=num_classes)
+    counts = np.clip(counts, 1, None)
+    weights = counts.sum() / (num_classes * counts)
+    return torch.tensor(weights, dtype=torch.float32, device=DEVICE)
 
 
 def build_model(num_classes, freeze_backbone=True):
@@ -109,7 +118,8 @@ def train(stage1_epochs=5, stage2_epochs=30, lr=1e-3, fine_tune_lr=1e-4,
     set_seed(seed)
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     train_loader, val_loader, classes = get_dataloaders(data_dir)
-    criterion = nn.CrossEntropyLoss()
+    class_weights = compute_class_weights(train_loader.dataset, len(classes))
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     history = []
     best_f1 = 0.0
 
