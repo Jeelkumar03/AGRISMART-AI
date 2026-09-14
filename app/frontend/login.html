@@ -12,31 +12,10 @@
   .auth-page { min-height: 100vh; display: grid; place-items: center; padding: 32px 18px; }
   .auth-wrap { width: 100%; max-width: 430px; animation: fadeUp 0.55s var(--ease); }
 
-  .lang-corner { position: fixed; top: 16px; right: 16px; z-index: 30; }
-  .lang-switch {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 10px;
-    color: var(--paper);
-    font-family: inherit;
-    font-size: 0.82rem;
-    padding: 7px 10px;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    cursor: pointer;
-  }
-  .lang-switch option { color: #08160D; }
+  .lang-corner { position: fixed; top: 22px; right: 24px; z-index: 30; }
 
   .brand { text-align: center; margin-bottom: 26px; }
-  .brand__leaf {
-    width: 54px; height: 54px; margin: 0 auto 14px;
-    display: grid; place-items: center; border-radius: 18px;
-    background: linear-gradient(145deg, rgba(131,190,106,0.34), rgba(131,190,106,0.08));
-    border: 1px solid rgba(131,190,106,0.4);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
-    animation: breathe 5s ease-in-out infinite;
-  }
-  @keyframes breathe { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .brand__mark { width: 72px; height: 72px; margin: 0 auto 16px; }
   .brand h1 { font-size: 1.72rem; }
   .brand p { margin: 7px 0 0; color: var(--paper-dim); font-size: 0.94rem; }
 
@@ -88,28 +67,95 @@
 <div class="grain" aria-hidden="true"></div>
 
 <div class="lang-corner">
-  <select id="langSwitch" class="lang-switch" aria-label="Language"></select>
+  <span class="lang-wrap">
+    <select id="langSwitch" class="lang-select" aria-label="Language"></select>
+  </span>
 </div>
 
 <div id="boot">
-  <div class="boot-mark">AgriSmart AI</div>
-  <div><span class="spinner boot-spin"></span>Checking your session…</div>
+  <div class="boot-logo">
+    <svg class="boot-logo__icon" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AgriSmart AI">
+      <defs>
+        <linearGradient id="leafGrad-boot" x1="0%" y1="0%" x2="60%" y2="100%">
+          <stop offset="0%" stop-color="#A9DB90" /><stop offset="45%" stop-color="#8AC672" /><stop offset="100%" stop-color="#4E7F3C" />
+        </linearGradient>
+        <linearGradient id="leafHighlight-boot" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#F4EFE0" stop-opacity="0.5" /><stop offset="50%" stop-color="#F4EFE0" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="veinGrad-boot" x1="50%" y1="0%" x2="50%" y2="100%">
+          <stop offset="0%" stop-color="#F4EFE0" /><stop offset="100%" stop-color="#C9E8B8" />
+        </linearGradient>
+        <radialGradient id="glowGrad-boot" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#EDC25A" stop-opacity="0.45" /><stop offset="100%" stop-color="#EDC25A" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <circle class="logo-glow" cx="100" cy="100" r="70" fill="url(#glowGrad-boot)" />
+      <g class="logo-hex"><polygon points="100,25 165,62 165,138 100,175 35,138 35,62" fill="none" stroke="rgba(244,239,224,0.35)" stroke-width="1.5" stroke-dasharray="6 4" /></g>
+      <g class="logo-sway">
+        <path class="logo-draw logo-draw--outline" d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="none" stroke="#4E7F3C" stroke-width="2.5" />
+        <g class="logo-fade">
+          <path d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="url(#leafGrad-boot)" />
+          <path d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="url(#leafHighlight-boot)" />
+        </g>
+        <path class="logo-draw" style="animation-delay:1.5s" d="M100 40 L 100 166" fill="none" stroke="url(#veinGrad-boot)" stroke-width="2" stroke-linecap="round" />
+        <path class="logo-draw" style="animation-delay:1.6s" d="M100 55 Q 82 58, 66 72" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:1.7s" d="M100 80 Q 78 82, 58 98" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:1.8s" d="M100 105 Q 76 108, 55 122" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:1.9s" d="M100 130 Q 82 135, 70 150" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:2.0s" d="M100 55 Q 118 58, 134 72" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:2.1s" d="M100 80 Q 122 82, 142 98" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:2.2s" d="M100 105 Q 124 108, 145 122" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:2.3s" d="M100 130 Q 118 135, 130 150" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <g class="logo-nodes">
+          <line class="logo-draw" style="animation-delay:2.5s" x1="100" y1="70" x2="75" y2="100" stroke="#EDC25A" stroke-width="1" opacity="0.6" />
+          <line class="logo-draw" style="animation-delay:2.7s" x1="100" y1="70" x2="125" y2="100" stroke="#EDC25A" stroke-width="1" opacity="0.6" />
+          <line class="logo-draw" style="animation-delay:2.9s" x1="75" y1="100" x2="100" y2="130" stroke="#EDC25A" stroke-width="1" opacity="0.6" />
+          <line class="logo-draw" style="animation-delay:3.1s" x1="125" y1="100" x2="100" y2="130" stroke="#EDC25A" stroke-width="1" opacity="0.6" />
+          <circle class="logo-fade logo-node" style="animation-delay:2.4s" cx="100" cy="70" r="4" fill="#EDC25A" />
+          <circle class="logo-fade logo-node" style="animation-delay:2.6s" cx="75" cy="100" r="3.5" fill="#EDC25A" />
+          <circle class="logo-fade logo-node" style="animation-delay:2.8s" cx="125" cy="100" r="3.5" fill="#EDC25A" />
+          <circle class="logo-fade logo-node" style="animation-delay:3.0s" cx="100" cy="130" r="4" fill="#EDC25A" />
+        </g>
+        <path class="logo-draw" style="animation-delay:2.4s" d="M100 168 Q 100 178, 97 192" fill="none" stroke="#4E7F3C" stroke-width="3" stroke-linecap="round" />
+      </g>
+    </svg>
+    <h1 class="boot-logo__text"><span class="boot-logo__agri">AgriSmart</span><span class="boot-logo__ai">AI</span></h1>
+  </div>
+  <div style="margin-top:6px;"><span class="spinner boot-spin"></span>Checking your session…</div>
 </div>
 
 <section class="auth-page">
   <div class="auth-wrap">
     <div class="brand">
-      <div class="brand__leaf">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9FD186" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
-          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+      <div class="brand__mark">
+        <svg class="logo-mark" width="72" height="72" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AgriSmart AI">
+          <defs>
+            <linearGradient id="leafGrad-mark" x1="0%" y1="0%" x2="60%" y2="100%">
+              <stop offset="0%" stop-color="#A9DB90" /><stop offset="45%" stop-color="#8AC672" /><stop offset="100%" stop-color="#4E7F3C" />
+            </linearGradient>
+            <linearGradient id="leafHighlight-mark" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F4EFE0" stop-opacity="0.5" /><stop offset="50%" stop-color="#F4EFE0" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <g class="logo-hex"><polygon points="100,25 165,62 165,138 100,175 35,138 35,62" fill="none" stroke="rgba(244,239,224,0.3)" stroke-width="2" stroke-dasharray="7 5" /></g>
+          <g class="logo-sway">
+            <path d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="url(#leafGrad-mark)" stroke="#4E7F3C" stroke-width="3" />
+            <path d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="url(#leafHighlight-mark)" />
+            <path d="M100 40 L 100 166" stroke="#F4EFE0" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
+            <g class="logo-node-pulse">
+              <circle cx="100" cy="70" r="5" fill="#EDC25A" />
+              <circle cx="75" cy="100" r="4.5" fill="#EDC25A" />
+              <circle cx="125" cy="100" r="4.5" fill="#EDC25A" />
+              <circle cx="100" cy="130" r="5" fill="#EDC25A" />
+            </g>
+          </g>
         </svg>
       </div>
       <h1>AgriSmart AI</h1>
       <p data-i18n="tagline">Spot crop disease from a single leaf photo.</p>
     </div>
 
-    <div class="glass auth-card">
+    <div class="glass glass--lift auth-card">
       <div class="tabs" id="tabs" role="tablist">
         <span class="tabs__glider" aria-hidden="true"></span>
         <button class="tab" id="tabLogin"  role="tab" aria-selected="true"  aria-controls="paneLogin" data-i18n="tab_login">Log in</button>

@@ -11,141 +11,172 @@
 <style>
   .topbar {
     position: sticky; top: 0; z-index: 20;
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    background: rgba(7,19,12,0.62);
-    border-bottom: 1px solid rgba(255,255,255,0.09);
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    background: linear-gradient(180deg, rgba(6,17,10,0.82), rgba(6,17,10,0.58));
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 8px 28px -8px rgba(0,0,0,0.5);
   }
   .topbar__inner {
-    max-width: 780px; margin: 0 auto; padding: 13px 20px;
-    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    max-width: 880px; margin: 0 auto; padding: 15px 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 32px;
   }
-  .wordmark { font-family: 'Fraunces', serif; font-size: 1.06rem; display: flex; align-items: center; gap: 9px; }
+
+  .wordmark {
+    font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 600;
+    display: flex; align-items: center; gap: 11px;
+    letter-spacing: -0.01em; white-space: nowrap;
+  }
   .wordmark .dot {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--paper-faint);
-    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--paper-faint); flex-shrink: 0;
+    transition: background-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
   }
-  .wordmark .dot.ok   { background: var(--moss);  box-shadow: 0 0 12px rgba(131,190,106,0.75); }
-  .wordmark .dot.down { background: var(--brick); box-shadow: 0 0 12px rgba(229,131,99,0.7); }
+  .wordmark .dot.ok   { background: var(--moss);  box-shadow: 0 0 14px rgba(138,198,114,0.85); }
+  .wordmark .dot.down { background: var(--brick); box-shadow: 0 0 14px rgba(232,138,107,0.8); }
 
-  .topbar__right { display: flex; align-items: center; gap: 14px; }
-  .lang-switch {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 10px;
-    color: var(--paper);
-    font-family: inherit;
-    font-size: 0.8rem;
-    padding: 6px 9px;
-    cursor: pointer;
+  .topbar__right { display: flex; align-items: center; gap: 22px; }
+
+  .topbar__divider {
+    width: 1px; height: 30px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.16), transparent);
+    flex-shrink: 0;
   }
-  .lang-switch option { color: #08160D; }
 
-  .userchip { display: flex; align-items: center; gap: 11px; }
+  .userchip { display: flex; align-items: center; gap: 12px; }
   .avatar {
-    width: 33px; height: 33px; border-radius: 11px;
+    width: 36px; height: 36px; border-radius: 12px; flex-shrink: 0;
     display: grid; place-items: center;
-    font-size: 0.85rem; font-weight: 600; color: #08160D;
-    background: linear-gradient(140deg, #9FD186, var(--moss-deep));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    font-size: 0.88rem; font-weight: 700; color: #071308;
+    background: linear-gradient(145deg, #A9DB90, var(--moss-deep));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 12px -2px rgba(78,127,60,0.4);
   }
-  .userchip__meta { line-height: 1.25; }
-  .userchip__meta b { font-size: 0.88rem; font-weight: 600; display: block; }
+  .userchip__meta { line-height: 1.3; }
+  .userchip__meta b { font-size: 0.89rem; font-weight: 600; display: block; white-space: nowrap; }
   .userchip__meta span { font-size: 0.76rem; color: var(--paper-faint); }
 
-  main { max-width: 780px; margin: 0 auto; padding: 34px 20px 90px; animation: fadeUp 0.5s var(--ease); }
+  main { max-width: 880px; margin: 0 auto; padding: 46px 28px 100px; animation: fadeUp 0.6s var(--ease); }
 
-  .hero { margin-bottom: 26px; }
-  .hero h2 { font-size: clamp(1.5rem, 4.2vw, 2.05rem); line-height: 1.22; max-width: 22ch; }
-  .hero p { color: var(--paper-dim); margin: 12px 0 0; max-width: 50ch; font-size: 0.97rem; }
+  .hero { margin-bottom: 34px; }
+  .hero h2 { font-size: clamp(1.6rem, 4.4vw, 2.3rem); line-height: 1.2; max-width: 22ch; }
+  .hero p { color: var(--paper-dim); margin: 15px 0 0; max-width: 52ch; font-size: 1rem; }
 
-  .upload-card { padding: 20px; }
+  .upload-card { padding: 22px; }
   .dropzone {
     display: block; width: 100%; cursor: pointer;
-    border: 1.6px dashed rgba(255,255,255,0.26);
-    border-radius: 19px; padding: 38px 18px; text-align: center;
-    transition: border-color 0.3s var(--ease), background-color 0.3s var(--ease), transform 0.3s var(--ease);
+    border: 1.6px dashed rgba(255,255,255,0.22);
+    border-radius: 21px; padding: 46px 20px; text-align: center;
+    background: rgba(255,255,255,0.015);
+    transition: border-color 0.35s var(--ease), background-color 0.35s var(--ease), transform 0.35s var(--ease);
   }
   .dropzone:hover, .dropzone.drag {
-    border-color: rgba(131,190,106,0.75);
-    background: rgba(131,190,106,0.09);
-    transform: scale(1.008);
+    border-color: rgba(138,198,114,0.7);
+    background: rgba(138,198,114,0.07);
   }
+  .dropzone.drag { transform: scale(1.012); border-style: solid; }
   .dropzone input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-  .dz-icon { font-size: 1.7rem; margin-bottom: 10px; opacity: 0.8; }
-  .dz-title { font-weight: 600; font-size: 0.99rem; }
-  .dz-hint { font-size: 0.83rem; color: var(--paper-faint); margin-top: 6px; }
+  .dz-icon {
+    font-size: 2rem; margin-bottom: 13px; opacity: 0.85;
+    transition: transform 0.4s var(--ease);
+    display: inline-block;
+  }
+  .dropzone:hover .dz-icon { transform: translateY(-4px) scale(1.08); }
+  .dz-title { font-weight: 600; font-size: 1rem; }
+  .dz-hint { font-size: 0.84rem; color: var(--paper-faint); margin-top: 7px; }
 
-  .preview-wrap { position: relative; display: none; border-radius: 19px; overflow: hidden; }
-  .preview-wrap.show { display: block; animation: popIn 0.4s var(--ease); }
-  #preview { display: block; width: 100%; max-height: 330px; object-fit: cover; }
+  .preview-wrap { position: relative; display: none; border-radius: 21px; overflow: hidden; }
+  .preview-wrap.show { display: block; animation: popIn 0.45s var(--ease); }
+  #preview { display: block; width: 100%; max-height: 340px; object-fit: cover; }
   .scanline {
     position: absolute; left: 0; right: 0; height: 3px; top: 0; display: none;
     background: linear-gradient(90deg, transparent, var(--wheat), transparent);
-    box-shadow: 0 0 22px 5px rgba(233,188,78,0.5);
+    box-shadow: 0 0 26px 6px rgba(237,194,90,0.55);
   }
-  .scanning .scanline { display: block; animation: scan 1.5s ease-in-out infinite; }
-  .scanning::after { content: ""; position: absolute; inset: 0; background: rgba(7,19,12,0.35); }
+  .scanning .scanline { display: block; animation: scan 1.6s ease-in-out infinite; }
+  .scanning::after { content: ""; position: absolute; inset: 0; background: rgba(6,17,10,0.38); }
   @keyframes scan { 0% { top: 0; } 50% { top: calc(100% - 3px); } 100% { top: 0; } }
 
-  .upload-actions { display: flex; gap: 12px; align-items: center; margin-top: 17px; }
+  .upload-actions { display: flex; gap: 14px; align-items: center; margin-top: 19px; }
   .upload-actions .btn { flex: 1; }
 
-  #report { margin-top: 26px; display: none; }
+  #report { margin-top: 30px; display: none; }
   #report.show { display: block; }
 
-  .rcard { padding: 22px 24px; margin-bottom: 15px; opacity: 0; transform: translateY(16px); }
-  .rcard.in { animation: riseIn 0.55s var(--ease) forwards; }
+  .rcard { padding: 26px 28px; margin-bottom: 17px; opacity: 0; transform: translateY(20px) scale(0.99); }
+  .rcard.in { animation: riseIn 0.6s var(--ease) forwards; }
   @keyframes riseIn { to { opacity: 1; transform: none; } }
 
-  .rlabel { font-family: 'Fraunces', serif; font-style: italic; font-size: 0.88rem; color: var(--paper-faint); margin: 0 0 13px; }
+  .rlabel {
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 0.89rem;
+    color: var(--paper-faint); margin: 0 0 15px;
+  }
 
-  .crop-name { font-family: 'Fraunces', serif; font-size: 1.62rem; font-weight: 600; margin: 0; }
-  .condition { font-size: 1.04rem; margin: 3px 0 17px; font-weight: 500; }
+  .crop-name { font-family: 'Fraunces', serif; font-size: 1.75rem; font-weight: 600; margin: 0; }
+  .condition { font-size: 1.06rem; margin: 4px 0 19px; font-weight: 500; }
   .condition.alert { color: var(--brick); }
   .condition.healthy { color: var(--moss); }
   .condition.uncertain { color: var(--slate); }
 
-  .bar { height: 7px; border-radius: 4px; background: rgba(255,255,255,0.12); overflow: hidden; }
-  .bar > i { display: block; height: 100%; width: 0; border-radius: 4px; background: linear-gradient(90deg, var(--moss-deep), var(--moss)); transition: width 1.05s var(--ease); }
-  .bar.wheat > i { background: linear-gradient(90deg, #B8862A, var(--wheat)); }
-  .bar-cap { font-size: 0.81rem; color: var(--paper-faint); margin: 7px 0 0; }
-
-  .pill { display: inline-block; font-size: 0.87rem; font-weight: 600; padding: 7px 16px; border-radius: 999px; border: 1px solid currentColor; }
-  .pill.moss  { color: var(--moss);  background: rgba(131,190,106,0.12); }
-  .pill.slate { color: var(--slate); background: rgba(134,176,209,0.12); }
-  .pill.dim   { color: var(--paper-faint); }
-  .reason { margin: 13px 0 0; color: var(--paper-dim); font-size: 0.93rem; }
-
-  .figs { display: flex; gap: 12px; flex-wrap: wrap; }
-  .fig {
-    flex: 1; min-width: 96px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 15px; padding: 14px 15px;
+  .bar { height: 8px; border-radius: 5px; background: rgba(255,255,255,0.1); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.24); }
+  .bar > i {
+    display: block; height: 100%; width: 0; border-radius: 5px;
+    background: linear-gradient(90deg, var(--moss-deep), var(--moss));
+    box-shadow: 0 0 12px rgba(138,198,114,0.45);
+    transition: width 1.15s var(--ease);
   }
-  .fig b { font-family: 'Fraunces', serif; font-size: 1.42rem; font-weight: 600; display: block; }
-  .fig span { font-size: 0.77rem; color: var(--paper-faint); }
+  .bar.wheat > i { background: linear-gradient(90deg, #B8862A, var(--wheat)); box-shadow: 0 0 12px rgba(237,194,90,0.45); }
+  .bar-cap { font-size: 0.82rem; color: var(--paper-faint); margin: 9px 0 0; }
 
-  .advice { list-style: none; padding: 0; margin: 16px 0 0; }
-  .advice li { position: relative; padding-left: 21px; margin-bottom: 9px; font-size: 0.92rem; color: var(--paper-dim); }
-  .advice li::before { content: ""; position: absolute; left: 3px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--wheat); }
+  .pill {
+    display: inline-block; font-size: 0.88rem; font-weight: 600;
+    padding: 8px 18px; border-radius: var(--radius-pill); border: 1px solid currentColor;
+  }
+  .pill.moss  { color: var(--moss);  background: rgba(138,198,114,0.11); }
+  .pill.slate { color: var(--slate); background: rgba(141,182,214,0.11); }
+  .pill.dim   { color: var(--paper-faint); }
+  .reason { margin: 15px 0 0; color: var(--paper-dim); font-size: 0.94rem; }
 
-  .score-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
-  .score-row b { font-family: 'Fraunces', serif; font-size: 2.5rem; font-weight: 600; line-height: 1; }
+  .figs { display: flex; gap: 13px; flex-wrap: wrap; }
+  .fig {
+    flex: 1; min-width: 100px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 16px; padding: 16px 17px;
+    transition: background-color 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .fig:hover { background: rgba(255,255,255,0.075); transform: translateY(-2px); }
+  .fig b { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 600; display: block; }
+  .fig span { font-size: 0.78rem; color: var(--paper-faint); }
+
+  .advice { list-style: none; padding: 0; margin: 18px 0 0; }
+  .advice li { position: relative; padding-left: 23px; margin-bottom: 11px; font-size: 0.93rem; color: var(--paper-dim); }
+  .advice li:last-child { margin-bottom: 0; }
+  .advice li::before {
+    content: ""; position: absolute; left: 3px; top: 8px;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--wheat);
+    box-shadow: 0 0 8px rgba(237,194,90,0.5);
+  }
+
+  .score-row { display: flex; align-items: baseline; gap: 11px; margin-bottom: 24px; }
+  .score-row b { font-family: 'Fraunces', serif; font-size: 2.8rem; font-weight: 600; line-height: 1; }
   .score-row span { color: var(--paper-faint); font-size: 0.95rem; }
 
-  .sub { margin-bottom: 16px; }
+  .sub { margin-bottom: 18px; }
   .sub:last-child { margin-bottom: 0; }
-  .sub__head { display: flex; justify-content: space-between; font-size: 0.89rem; margin-bottom: 6px; }
+  .sub__head { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 7px; }
   .sub__head span:last-child { color: var(--paper-dim); }
-  .sub__cap { font-size: 0.78rem; color: var(--paper-faint); margin: 6px 0 0; }
+  .sub__cap { font-size: 0.79rem; color: var(--paper-faint); margin: 7px 0 0; }
 
-  footer { max-width: 780px; margin: 0 auto; padding: 0 20px 42px; font-size: 0.81rem; color: var(--paper-faint); }
+  footer { max-width: 880px; margin: 0 auto; padding: 0 28px 48px; font-size: 0.82rem; color: var(--paper-faint); }
 
-  @media (max-width: 540px) {
-    .rcard { padding: 20px 18px; }
+  @media (max-width: 720px) {
+    .topbar__inner { padding: 13px 18px; gap: 14px; }
+    .topbar__right { gap: 13px; }
+    .topbar__divider { display: none; }
     .userchip__meta { display: none; }
+    main { padding: 34px 18px 80px; }
+    .rcard { padding: 22px 20px; }
+    footer { padding: 0 18px 40px; }
   }
 </style>
 </head>
@@ -160,23 +191,90 @@
 <div class="grain" aria-hidden="true"></div>
 
 <div id="boot">
-  <div class="boot-mark">AgriSmart AI</div>
-  <div><span class="spinner boot-spin"></span>Loading your account…</div>
+  <div class="boot-logo">
+    <svg class="boot-logo__icon" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AgriSmart AI">
+      <defs>
+        <linearGradient id="leafGrad-boot" x1="0%" y1="0%" x2="60%" y2="100%">
+          <stop offset="0%" stop-color="#A9DB90" /><stop offset="45%" stop-color="#8AC672" /><stop offset="100%" stop-color="#4E7F3C" />
+        </linearGradient>
+        <linearGradient id="leafHighlight-boot" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#F4EFE0" stop-opacity="0.5" /><stop offset="50%" stop-color="#F4EFE0" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="veinGrad-boot" x1="50%" y1="0%" x2="50%" y2="100%">
+          <stop offset="0%" stop-color="#F4EFE0" /><stop offset="100%" stop-color="#C9E8B8" />
+        </linearGradient>
+        <radialGradient id="glowGrad-boot" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#EDC25A" stop-opacity="0.45" /><stop offset="100%" stop-color="#EDC25A" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <circle class="logo-glow" cx="100" cy="100" r="70" fill="url(#glowGrad-boot)" />
+      <g class="logo-hex"><polygon points="100,25 165,62 165,138 100,175 35,138 35,62" fill="none" stroke="rgba(244,239,224,0.35)" stroke-width="1.5" stroke-dasharray="6 4" /></g>
+      <g class="logo-sway">
+        <path class="logo-draw logo-draw--outline" d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="none" stroke="#4E7F3C" stroke-width="2.5" />
+        <g class="logo-fade">
+          <path d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="url(#leafGrad-boot)" />
+          <path d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="url(#leafHighlight-boot)" />
+        </g>
+        <path class="logo-draw" style="animation-delay:1.5s" d="M100 40 L 100 166" fill="none" stroke="url(#veinGrad-boot)" stroke-width="2" stroke-linecap="round" />
+        <path class="logo-draw" style="animation-delay:1.6s" d="M100 55 Q 82 58, 66 72" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:1.7s" d="M100 80 Q 78 82, 58 98" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:1.8s" d="M100 105 Q 76 108, 55 122" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:1.9s" d="M100 130 Q 82 135, 70 150" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:2.0s" d="M100 55 Q 118 58, 134 72" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:2.1s" d="M100 80 Q 122 82, 142 98" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:2.2s" d="M100 105 Q 124 108, 145 122" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <path class="logo-draw" style="animation-delay:2.3s" d="M100 130 Q 118 135, 130 150" fill="none" stroke="#F4EFE0" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+        <g class="logo-nodes">
+          <line class="logo-draw" style="animation-delay:2.5s" x1="100" y1="70" x2="75" y2="100" stroke="#EDC25A" stroke-width="1" opacity="0.6" />
+          <line class="logo-draw" style="animation-delay:2.7s" x1="100" y1="70" x2="125" y2="100" stroke="#EDC25A" stroke-width="1" opacity="0.6" />
+          <line class="logo-draw" style="animation-delay:2.9s" x1="75" y1="100" x2="100" y2="130" stroke="#EDC25A" stroke-width="1" opacity="0.6" />
+          <line class="logo-draw" style="animation-delay:3.1s" x1="125" y1="100" x2="100" y2="130" stroke="#EDC25A" stroke-width="1" opacity="0.6" />
+          <circle class="logo-fade logo-node" style="animation-delay:2.4s" cx="100" cy="70" r="4" fill="#EDC25A" />
+          <circle class="logo-fade logo-node" style="animation-delay:2.6s" cx="75" cy="100" r="3.5" fill="#EDC25A" />
+          <circle class="logo-fade logo-node" style="animation-delay:2.8s" cx="125" cy="100" r="3.5" fill="#EDC25A" />
+          <circle class="logo-fade logo-node" style="animation-delay:3.0s" cx="100" cy="130" r="4" fill="#EDC25A" />
+        </g>
+        <path class="logo-draw" style="animation-delay:2.4s" d="M100 168 Q 100 178, 97 192" fill="none" stroke="#4E7F3C" stroke-width="3" stroke-linecap="round" />
+      </g>
+    </svg>
+    <h1 class="boot-logo__text"><span class="boot-logo__agri">AgriSmart</span><span class="boot-logo__ai">AI</span></h1>
+  </div>
+  <div style="margin-top:6px;"><span class="spinner boot-spin"></span>Loading your account…</div>
 </div>
 
 <header class="topbar">
   <div class="topbar__inner">
-    <span class="wordmark"><span class="dot" id="healthDot"></span>AgriSmart AI</span>
+    <span class="wordmark">
+      <svg class="logo-mark" width="26" height="26" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AgriSmart AI">
+        <defs>
+          <linearGradient id="leafGrad-topmark" x1="0%" y1="0%" x2="60%" y2="100%">
+            <stop offset="0%" stop-color="#A9DB90" /><stop offset="45%" stop-color="#8AC672" /><stop offset="100%" stop-color="#4E7F3C" />
+          </linearGradient>
+        </defs>
+        <g class="logo-hex"><polygon points="100,25 165,62 165,138 100,175 35,138 35,62" fill="none" stroke="rgba(244,239,224,0.3)" stroke-width="3" stroke-dasharray="8 6" /></g>
+        <g class="logo-sway">
+          <path d="M100 35 C 65 45, 42 80, 44 120 C 46 150, 70 172, 100 168 C 130 172, 154 150, 156 120 C 158 80, 135 45, 100 35 Z" fill="url(#leafGrad-topmark)" stroke="#4E7F3C" stroke-width="4" />
+          <g class="logo-node-pulse">
+            <circle cx="100" cy="80" r="7" fill="#EDC25A" />
+            <circle cx="100" cy="120" r="7" fill="#EDC25A" />
+          </g>
+        </g>
+      </svg>
+      <span class="dot" id="healthDot"></span>AgriSmart AI
+    </span>
     <div class="topbar__right">
-      <select id="langSwitch" class="lang-switch" aria-label="Language"></select>
+      <span class="lang-wrap">
+        <select id="langSwitch" class="lang-select" aria-label="Language"></select>
+      </span>
+      <span class="topbar__divider" aria-hidden="true"></span>
       <div class="userchip">
         <span class="avatar" id="avatar">–</span>
         <span class="userchip__meta">
           <b id="userName">–</b>
           <span id="userLocation">–</span>
         </span>
-        <button class="linkbtn" id="logoutBtn" data-i18n="logout">Log out</button>
       </div>
+      <button class="linkbtn" id="logoutBtn" data-i18n="logout">Log out</button>
     </div>
   </div>
 </header>
@@ -189,7 +287,7 @@
 
   <div class="notice" id="appNotice" role="alert"></div>
 
-  <div class="glass upload-card">
+  <div class="glass glass--lift upload-card">
     <label class="dropzone" id="dropzone" for="fileInput" tabindex="0">
       <div id="dzIdle">
         <div class="dz-icon">🍃</div>
@@ -209,12 +307,12 @@
   </div>
 
   <div id="report">
-    <div class="glass rcard" id="cardDiagnosis"></div>
-    <div class="glass rcard" id="cardExplain"></div>
-    <div class="glass rcard" id="cardAdvice"></div>
-    <div class="glass rcard" id="cardIrrigation"></div>
-    <div class="glass rcard" id="cardWeather"></div>
-    <div class="glass rcard" id="cardSustain"></div>
+    <div class="glass glass--lift rcard" id="cardDiagnosis"></div>
+    <div class="glass glass--lift rcard" id="cardExplain"></div>
+    <div class="glass glass--lift rcard" id="cardAdvice"></div>
+    <div class="glass glass--lift rcard" id="cardIrrigation"></div>
+    <div class="glass glass--lift rcard" id="cardWeather"></div>
+    <div class="glass glass--lift rcard" id="cardSustain"></div>
   </div>
 </main>
 
